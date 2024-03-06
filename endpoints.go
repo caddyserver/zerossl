@@ -158,13 +158,13 @@ func (c Client) ResendVerificationEmail(ctx context.Context, certificateID strin
 	endpoint := fmt.Sprintf("/certificates/%s/challenges/email", url.QueryEscape(certificateID))
 
 	var result struct {
-		Success int `json:"success"`
+		Success anyBool `json:"success"`
 	}
 	if err := c.httpGet(ctx, endpoint, nil, &result); err != nil {
 		return err
 	}
 
-	if result.Success != 1 {
+	if !result.Success {
 		return fmt.Errorf("got %v without any error status", result)
 	}
 
@@ -179,13 +179,13 @@ func (c Client) RevokeCertificate(ctx context.Context, certificateID string, rea
 	qs := url.Values{"reason": []string{string(reason)}}
 
 	var result struct {
-		Success int `json:"success"`
+		Success anyBool `json:"success"`
 	}
 	if err := c.httpGet(ctx, endpoint, qs, &result); err != nil {
 		return err
 	}
 
-	if result.Success != 1 {
+	if !result.Success {
 		return fmt.Errorf("got %v without any error status", result)
 	}
 
@@ -197,13 +197,13 @@ func (c Client) CancelCertificate(ctx context.Context, certificateID string) err
 	endpoint := fmt.Sprintf("/certificates/%s/cancel", url.QueryEscape(certificateID))
 
 	var result struct {
-		Success int `json:"success"`
+		Success anyBool `json:"success"`
 	}
 	if err := c.httpPost(ctx, endpoint, nil, nil, &result); err != nil {
 		return err
 	}
 
-	if result.Success != 1 {
+	if !result.Success {
 		return fmt.Errorf("got %v without any error status", result)
 	}
 

@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -126,6 +127,34 @@ func (c Client) httpClient() *http.Client {
 
 var httpClient = &http.Client{
 	Timeout: 2 * time.Minute,
+}
+
+// anyBool is a hacky type that accepts true or 1 (or their string variants),
+// or "yes" or "y", and any casing variants of the same, as a boolean true when
+// unmarshaling JSON. Everything else is boolean false.
+//
+// This is needed due to type inconsistencies in ZeroSSL's API with "success" values.
+type anyBool bool
+
+// UnmarshalJSON satisfies json.Unmarshaler according to
+// this type's documentation.
+func (ab *anyBool) UnmarshalJSON(b []byte) error {
+	if len(b) == 0 {
+		return io.EOF
+	}
+	switch strings.ToLower(string(b)) {
+	case `true`, `"true"`, `1`, `"1"`, `"yes"`, `"y"`:
+		*ab = true
+	}
+	return nil
+}
+
+// MarshalJSON marshals ab to either true or false.
+func (ab *anyBool) MarshalJSON() ([]byte, error) {
+	if ab != nil && *ab {
+		return []byte("true"), nil
+	}
+	return []byte("false"), nil
 }
 
 const accessKeyParam = "access_key"

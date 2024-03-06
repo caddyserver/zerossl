@@ -3,7 +3,7 @@ package zerossl
 import "fmt"
 
 type APIError struct {
-	Success   bool `json:"success"`
+	Success   anyBool `json:"success"`
 	ErrorInfo struct {
 		Code int    `json:"code"`
 		Type string `json:"type"`
