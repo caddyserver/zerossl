@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -68,7 +69,26 @@ func (c Client) DownloadCertificateFile(ctx context.Context, certificateID strin
 		qs.Set("include_cross_signed", "1")
 	}
 
-	return c.httpPost(ctx, endpoint, qs, nil, nil)
+	url := c.url(endpoint, qs)
+	r, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.httpClient().Do(r)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: HTTP %d", resp.StatusCode)
+	}
+
+	if _, err := io.Copy(output, resp.Body); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c Client) DownloadCertificate(ctx context.Context, certificateID string, includeCrossSigned bool) (CertificateBundle, error) {
