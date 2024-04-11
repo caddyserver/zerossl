@@ -17,7 +17,8 @@ type Client struct {
 	// REQUIRED: Your ZeroSSL account access key.
 	AccessKey string `json:"access_key"`
 
-	// Optionally adjust the base URL of the API. Default: api.zerossl.com
+	// Optionally adjust the base URL of the API.
+	// Default: https://api.zerossl.com
 	BaseURL string `json:"base_url,omitempty"`
 
 	// Optionally configure a custom HTTP client.
@@ -111,11 +112,20 @@ func (c Client) url(endpoint string, qs url.Values) string {
 	if baseURL == "" {
 		baseURL = BaseURL
 	}
+
+	// for consistency, ensure endpoint starts with /
+	// and base URL does NOT end with /.
+	if !strings.HasPrefix(endpoint, "/") {
+		endpoint = "/" + endpoint
+	}
+	baseURL = strings.TrimSuffix(baseURL, "/")
+
 	if qs == nil {
 		qs = url.Values{}
 	}
 	qs.Set(accessKeyParam, c.AccessKey)
-	return fmt.Sprintf("https://%s%s?%s", baseURL, endpoint, qs.Encode())
+
+	return fmt.Sprintf("%s%s?%s", baseURL, endpoint, qs.Encode())
 }
 
 func (c Client) httpClient() *http.Client {

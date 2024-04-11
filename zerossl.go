@@ -8,7 +8,8 @@ import (
 	"fmt"
 )
 
-const BaseURL = "api.zerossl.com"
+// The base URL to the ZeroSSL API.
+const BaseURL = "https://api.zerossl.com"
 
 // ListAllCertificates returns parameters that lists all the certificates on the account;
 // be sure to set Page and Limit if paginating.
