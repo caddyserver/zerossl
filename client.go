@@ -92,8 +92,10 @@ func (c Client) httpRequest(ctx context.Context, method, reqURL string, reqBody 
 	}
 
 	// if there was no error, decode into target payload
-	if err = json.NewDecoder(bytes.NewReader(respBytes)).Decode(&target); err == nil {
-		return fmt.Errorf("request succeeded, but decoding JSON response body failed: %v (raw=%s)", err, respBytes)
+	if target != nil {
+		if err = json.NewDecoder(bytes.NewReader(respBytes)).Decode(target); err != nil {
+			return fmt.Errorf("request succeeded, but decoding JSON response body failed: %v (raw=%s)", err, respBytes)
+		}
 	}
 
 	return nil
