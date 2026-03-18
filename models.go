@@ -102,3 +102,13 @@ type ValidationStatus struct {
 		Status string `json:"status"`
 	} `json:"details"`
 }
+
+// EXPERIMENTAL: Not yet final
+type CACertificate struct {
+	ID                  int    `json:"id"`
+	SHA1Hash            string `json:"sha1_hash"`
+	CertificateCrt      string `json:"certificate.crt"`
+	CABundleCrt         string `json:"ca_bundle.crt"`
+	EncryptionAlgorithm string `json:"encryption_algorithm"`
+	Created             string `json:"created"` // "Y-m-d H:i:s"
+}
